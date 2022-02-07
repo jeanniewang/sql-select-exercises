@@ -140,7 +140,7 @@ SELECT name, city from airports INNER JOIN cities ON airports.city_id = cities.i
 
 
 \echo ========= Problem 4.2 ====================================================
-\echo Write a SQL query using an INNER JOIN to join data from the "cities" table
+\echo     Write a SQL query using an INNER JOIN to join data from the "cities" table
 \echo     with data from the "airports" table to find out how many airports are in
 \echo     New York City using the city name.
 \echo     (Note: Use the aggregate function COUNT() to count the number of matching
@@ -154,52 +154,50 @@ GROUP BY city;
 SELECT COUNT(name) number_airport
 FROM cities INNER JOIN airports ON cities.id = airports.city_id
 WHERE city = 'New York' AND name LIKE '%' || 'New York' || '%';
+
+SELECT city, name as airport_name
+FROM cities INNER JOIN airports ON cities.id = airports.city_id
+WHERE city = 'New York' AND name LIKE '%' || 'New York' || '%';
 --------------------------------------------------------------------------------
 ---- Bonuses:
 --------------------------------------------------------------------------------
 
 \echo ========= Problem B.1 ====================================================
 \echo
-/*
-B.1) Apostrophe: Write a SQL query to get all three ID codes (the Federal
-     Aviation Administration (FAA) ID, the International Air Transport
-     Association (IATA) ID, and the International Civil Aviation Organization
-     (ICAO) ID) from the "airports" table for Chicago O'Hare International
-     Airport.
-     (Note: You'll need to escape the quotation mark in O'Hare. See How to
-      include a single quote in a SQL query.)
-*/
 
--- your query here
+\echo     B.1) Apostrophe: Write a SQL query to get all three ID codes (the Federal
+\echo     Aviation Administration (FAA) ID, the International Air Transport
+\echo     Association (IATA) ID, and the International Civil Aviation Organization
+\echo     (ICAO) ID) from the "airports" table for  "Chicago O' Hare International Airport".
+\echo     (Note: You will need to escape the quotation mark in "Chicago O' Hare International Airport".
+\echo     See How to include a single quote in a SQL query.)
+
+Select faa_id, iata_id, icao_id, name from airports where name = 'Chicago O''Hare International Airport';
 
 \echo ========= Problem B.2 ====================================================
 \echo
-/*
-B.2) Formatting Commas: Refactor Phase 2, Query #1 to turn the INT for estimated
-     population in 2018 into a character string with commas. (Note: See Data
-     Type Formatting Functions)
 
-     * Phase 2, Query #1: Write a SQL query that returns the city, state, and
-       estimated population in 2018 from the "cities" table.
-*/
+\echo     B.2) Formatting Commas: Refactor Phase 2, Query #1 to turn the INT for estimated
+\echo     population in 2018 into a character string with commas. (Note: See Data
+\echo     Type Formatting Functions)
+\echo     * Phase 2, Query #1: Write a SQL query that returns the city, state, and
+\echo     estimated population in 2018 from the "cities" table.
 
--- your query here
+Select city, state, TO_CHAR(population_estimate_2018, '9,999,999') population_estimate_2018 from cities;
 
 \echo ========= Problem B.3 ====================================================
 \echo
-/*
-B.3) Decimals and Rounding: Refactor Phase 3, Query #5 to turn number of
-     millions from an integer into a decimal rounded to a precision of two
-     decimal places.
-     (Note: See Numeric Types and the ROUND function.)
 
-     * Phase 3, Query #5: Write a SQL query to get the city and estimated
-       population in 2018 in number of millions (i.e. without zeroes at the
-       end: 1 million), and that uses a WHERE clause to return only the cities
-       in Texas.
-*/
+\echo     B.3) Decimals and Rounding: Refactor Phase 3, Query #5 to turn number of
+\echo     millions from an integer into a decimal rounded to a precision of two
+\echo     decimal places.
+\echo     (Note: See Numeric Types and the ROUND function.)
+\echo     * Phase 3, Query #5: Write a SQL query to get the city and estimated
+\echo       population in 2018 in number of millions (i.e. without zeroes at the
+\echo       end: 1 million), and that uses a WHERE clause to return only the cities
+\echo       in Texas.
 
--- your query here
+
 
 \echo ========= Problem B.4 ====================================================
 \echo
@@ -212,12 +210,23 @@ B.4) ORDER BY and LIMIT Clauses: Refactor Phase 3, Query #10 to return only one
       it to 200,000, use the ORDER BY Clause with the LIMIT Clause to sort the
       results and grab only the top result.)
 
-     * Phase 3, Query #10: Write a SQL query that uses a WHERE clause to find
-       the cities where the population has increased by over 200,000 people from
-       2010 to 2018. Show the city name, the estimated population in 2018, and
-       the census population in 2010.
+     Phase 3, Query #10: Write a SQL query that uses a WHERE clause to find
+     the cities where the population has increased by over 200,000 people from
+     2010 to 2018. Show the city name, the estimated population in 2018, and
+     the census population in 2010.
 */
 
--- your query here
+Select id, city, state,  population_estimate_2018, population_census_2010, 
+(population_estimate_2018 - population_census_2010) increase_from_2010_to_2018 
+from cities order by increase_from_2010_to_2018 DESC LIMIT 1;
+
+--  https://sqlbolt.com/lesson/select_queries_order_of_execution
+-- Once we have the total working set of data, the first-pass WHERE constraints are applied to the individual rows, 
+-- and rows that do not satisfy the constraint are discarded. Each of the constraints can only access columns directly
+--  from the tables requested in the FROM clause. Aliases in the SELECT part of the query are not accessible in most 
+-- databases since they may include expressions dependent on parts of the query that have not yet executed.
+Select id, city, state,  population_estimate_2018, population_census_2010, 
+(population_estimate_2018 - population_census_2010) as increase_from_2010_to_2018 
+from cities WHERE (population_estimate_2018 - population_census_2010) > 200000 order by increase_from_2010_to_2018 DESC;
 
 \echo ========= (done!) ========================================================
